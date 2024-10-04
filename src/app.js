@@ -1,5 +1,5 @@
 require('dotenv').config();
-import packageJson from '../package.json';
+const packageJson = require('../package.json');
 const express = require('express');
 const mongoose = require('mongoose');
 const errorHandler = require('./middleware/errorHandler');
