@@ -11,13 +11,13 @@ const { protect } = require('../middleware/auth');
 
 const router = express.Router();
 
-router.route('/').get(getQuestions)
-router.route('/').post(protect, createQuestion);
+router.get('/', getQuestions)
+router.post('/', protect, createQuestion);
 
-router.route('/:id').get(getQuestion)
-router.route('/:id').put(protect, updateQuestion)
-router.route('/:id').delete(protect, deleteQuestion);
+router.get('/:id', getQuestion)
+router.put('/:id', protect, updateQuestion)
+router.delete('/:id', protect, deleteQuestion);
 
-router.route('/number/:number').get(getQuestionByNumber);
+router.get('/number/:number', getQuestionByNumber);
 
 module.exports = router;
