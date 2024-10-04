@@ -1,15 +1,6 @@
 const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
-const { checkAuthorization } = require('../utils/checkAuthorization');
 const { successResponse, errorResponse } = require('../utils/responseHandler');
-
-const findUserByIdOrEmail = async (idOrEmail) => {
-  let user = await User.findById(idOrEmail);
-  if (!user && idOrEmail.includes('@')) {
-    user = await User.findOne({ email: idOrEmail.toLowerCase() });
-  }
-  return user;
-};
 
 exports.createUser = asyncHandler(async (req, res) => {
   try {
@@ -35,9 +26,9 @@ exports.getUsers = asyncHandler(async (req, res) => {
 
 exports.getUser = asyncHandler(async (req, res) => {
   try {
-    const user = await findUserByIdOrEmail(req.params.idOrEmail);
+    const user = await User.findById(req.params.id);
     if (!user) {
-      return errorResponse(res, 'Пользователь не найден', 404);
+      return errorResponse(res, 'User not found', 404);
     }
     successResponse(res, user);
   } catch (error) {
@@ -47,38 +38,13 @@ exports.getUser = asyncHandler(async (req, res) => {
 
 exports.updateUser = asyncHandler(async (req, res) => {
   try {
-    let user = await User.findById(req.params.idOrEmail);
+    const user = await User.findById(req.params.id);
     if (!user) {
-      return errorResponse(res, 'Пользователь не найден', 404);
-    }
-    if (req.body.email) req.body.email = req.body.email.toLowerCase();
-    user = await User.findByIdAndUpdate(user._id, req.body, {
-      new: true,
-      runValidators: true
-    });
-    successResponse(res, user);
-  } catch (error) {
-    errorResponse(res, error.message);
-  }
-});
-exports.updateUser = asyncHandler(async (req, res) => {
-  try {
-    let user = await User.findById(req.params.idOrEmail);
-    if (!user) {
-      const isAuthorized = checkAuthorization(req);
-      if (isAuthorized) {
-        user = await findUserByIdOrEmail(req.params.idOrEmail);
-      } else {
-        return errorResponse(res, 'У вас нет прав для изменения пользователя', 403);
-      }
-    }
-    
-    if (!user) {
-      return errorResponse(res, 'Пользователь не найден', 404);
+      return errorResponse(res, 'User not found', 404);
     }
     
     if (req.body.email) req.body.email = req.body.email.toLowerCase();
-    
+
     const updatedUser = await User.findByIdAndUpdate(user._id, req.body, {
       new: true,
       runValidators: true
@@ -92,9 +58,9 @@ exports.updateUser = asyncHandler(async (req, res) => {
 
 exports.deleteUser = asyncHandler(async (req, res) => {
   try {
-    const user = await findUserByIdOrEmail(req.params.idOrEmail);
+    const user = await User.findById(req.params.id);
     if (!user) {
-      return errorResponse(res, 'Пользователь не найден', 404);
+      return errorResponse(res, 'User not found', 404);
     }
     await user.remove();
     successResponse(res, null, 204);

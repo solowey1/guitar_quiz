@@ -8,7 +8,7 @@ router.route('/')
   .get(protect, controller.getUsers)
   .post(controller.createUser);
 
-router.route('/:idOrEmail')
+router.route('/:id')
   .get(controller.getUser)
   .put(controller.updateUser)
   .delete(protect, controller.deleteUser);
