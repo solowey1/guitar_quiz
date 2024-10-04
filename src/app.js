@@ -15,6 +15,9 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 app.use(express.json());
 
+app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/questions', require('./routes/questionRoutes'));
+app.use('/api/user-answers', require('./routes/userAnswerRoutes'));
 app.use('/', (req, res) => {
   res.json({
     message: 'Добро пожаловать в Guitar Quiz API',
@@ -26,9 +29,10 @@ app.use('/', (req, res) => {
     ]
   });
 });
-app.use('/api/users', require('./routes/userRoutes'));
-app.use('/api/questions', require('./routes/questionRoutes'));
-app.use('/api/user-answers', require('./routes/userAnswerRoutes'));
+
+app.use('*', (req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
 
 app.use(errorHandler);
 
