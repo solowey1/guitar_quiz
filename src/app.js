@@ -7,28 +7,19 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+// Добавление morgan для логирования HTTP запросов
+app.use(morgan('[:date[iso]] :method :url :status :response-time ms - :res[content-length]'));
+
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Successfully connected to MongoDB'))
   .catch(err => console.error('Error connecting to MongoDB:', err));
 
 app.use(express.json());
 
-// Добавление morgan для логирования HTTP запросов
-app.use(morgan('dev'));
-
 // Middleware для логирования всех запросов
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
   next();
-});
-
-// Обработка ошибок
-app.use((err, req, res, next) => {
-  console.error(`${new Date().toISOString()} - Error:`, err);
-  res.status(500).json({ error: 'Internal Server Error' });
 });
 
 app.use('/api/users', require('./routes/userRoutes'));

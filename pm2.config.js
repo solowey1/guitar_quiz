@@ -2,7 +2,7 @@ module.exports = {
   apps: [{
     name: "app",
     script: "src/app.js",
-    watch: true,
+    watch: false,
     env: {
       "NODE_ENV": "development",
     },
@@ -11,7 +11,8 @@ module.exports = {
     },
     output: './logs/out.log',
     error: './logs/error.log',
-    log: './logs/combined.log',
+    log_date_format: "YYYY-MM-DD HH:mm:ss Z",
+    combine_logs: true,
     time: true
   }]
 }
