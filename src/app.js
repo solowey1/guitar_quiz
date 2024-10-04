@@ -12,6 +12,13 @@ app.use(corsMiddleware);
 
 app.use(morgan('[:date[iso]] :method :url :status :response-time ms - :res[content-length]'));
 
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+  console.log('Headers:', req.headers);
+  console.log('Body:', req.body);
+  next();
+});
+
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Successfully connected to MongoDB'))
   .catch(err => console.error('Error connecting to MongoDB:', err));
