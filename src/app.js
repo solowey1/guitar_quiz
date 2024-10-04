@@ -11,8 +11,8 @@ const app = express();
 app.use(morgan('[:date[iso]] :method :url :status :response-time ms - :res[content-length]'));
 
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Successfully connected to MongoDB'))
-  .catch(err => console.error('Error connecting to MongoDB:', err));
+.then(() => console.log('Successfully connected to MongoDB'))
+.catch(err => console.error('Error connecting to MongoDB:', err));
 
 app.use(express.json());
 
@@ -27,11 +27,13 @@ app.use((req, res, next) => {
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/questions', require('./routes/questionRoutes'));
 app.use('/api/user-answers', require('./routes/userAnswerRoutes'));
+app.use('/api/leaderboard', require('./routes/leaderboardRoutes'));
 app.use('/', (req, res) => {
   res.json({
-    message: 'Добро пожаловать в Guitar Quiz API',
+    message: `Welcome to ${packageJson.name} API`,
     version: packageJson.version,
     endpoints: [
+      '/api/leaderboard',
       '/api/questions',
       '/api/users',
       '/api/user-answers'

@@ -7,9 +7,13 @@ const UserAnswerSchema = new mongoose.Schema({
   answers: [{
     questionId: { type: mongoose.Schema.Types.ObjectId, required: true },
     selectedOptions: [Number],
-    isFullyCorrect: Boolean
+    correctOptions: [Number],
+    isFullyCorrect: Boolean,
+    partialScore: Number
   }],
   totalCorrect: Number,
+  totalQuestions: Number,
+  score: Number,
   timeSpent: Number
 }, {
   timestamps: true

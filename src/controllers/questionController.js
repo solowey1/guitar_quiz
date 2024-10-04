@@ -1,99 +1,107 @@
 const Question = require('../models/Question');
 const asyncHandler = require('../utils/asyncHandler');
+const { checkAuthorization } = require('../utils/checkAuthorization');
+const { successResponse, errorResponse } = require('../utils/responseHandler');
+
+const processQuestion = (question, isAuthorized) => {
+  if (!isAuthorized) {
+    const processedQuestion = question.toObject();
+    processedQuestion.options = processedQuestion.options.map(option => ({
+      text: option.text,
+    }));
+    return processedQuestion;
+  }
+  return question;
+};
 
 exports.createQuestion = asyncHandler(async (req, res) => {
-  console.log('Received request body:', req.body);
-
-  const lastQuestion = await Question.findOne().sort('-number');
-  const newNumber = lastQuestion ? lastQuestion.number + 1 : 1;
-
   try {
+    const lastQuestion = await Question.findOne().sort('-number');
+    const newNumber = lastQuestion ? lastQuestion.number + 1 : 1;
+
     const question = await Question.create({
       ...req.body,
       number: newNumber
     });
 
-    console.log('Created question:', question);
-
-    res.status(201).json({
-      success: true,
-      data: question
-    });
+    successResponse(res, question, 201);
   } catch (error) {
-    console.error('Error creating question:', error);
-    res.status(400).json({
-      success: false,
-      error: error.message
-    });
+    errorResponse(res, error.message);
   }
 });
 
 exports.getQuestions = asyncHandler(async (req, res) => {
-  const questions = await Question.find().sort('number');
-  res.status(200).json({
-    success: true,
-    count: questions.length,
-    data: questions
-  });
+  try {
+    const isAuthorized = checkAuthorization(req);
+    const questions = await Question.find().sort('number');
+    const processedQuestions = questions.map(question =>
+      processQuestion(question, isAuthorized)
+    );
+
+    successResponse(res, {
+      count: processedQuestions.length,
+      data: processedQuestions
+    });
+  } catch (error) {
+    errorResponse(res, error.message);
+  }
 });
 
 exports.getQuestion = asyncHandler(async (req, res) => {
-  const question = await Question.findById(req.params.id);
-  if (!question) {
-    return res.status(404).json({
-      success: false,
-      message: 'Вопрос не найден'
-    });
+  try {
+    const isAuthorized = checkAuthorization(req);
+    const question = await Question.findById(req.params.id);
+    if (!question) {
+      return errorResponse(res, 'Вопрос не найден', 404);
+    }
+
+    const processedQuestion = processQuestion(question, isAuthorized);
+    successResponse(res, processedQuestion);
+  } catch (error) {
+    errorResponse(res, error.message);
   }
-  res.status(200).json({
-    success: true,
-    data: question
-  });
 });
 
 exports.getQuestionByNumber = asyncHandler(async (req, res) => {
-  const question = await Question.findOne({ number: req.params.number });
-  if (!question) {
-    return res.status(404).json({
-      success: false,
-      message: 'Вопрос не найден'
-    });
+  try {
+    const isAuthorized = checkAuthorization(req);
+    const question = await Question.findOne({ number: req.params.number });
+    if (!question) {
+      return errorResponse(res, 'Вопрос не найден', 404);
+    }
+
+    const processedQuestion = processQuestion(question, isAuthorized);
+    successResponse(res, processedQuestion);
+  } catch (error) {
+    errorResponse(res, error.message);
   }
-  res.status(200).json({
-    success: true,
-    data: question
-  });
 });
 
 exports.updateQuestion = asyncHandler(async (req, res) => {
-  let question = await Question.findById(req.params.id);
-  if (!question) {
-    return res.status(404).json({
-      success: false,
-      message: 'Вопрос не найден'
+  try {
+    let question = await Question.findById(req.params.id);
+    if (!question) {
+      return errorResponse(res, 'Вопрос не найден', 404);
+    }
+    question = await Question.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
     });
+    successResponse(res, question);
+  } catch (error) {
+    errorResponse(res, error.message);
   }
-  question = await Question.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true
-  });
-  res.status(200).json({
-    success: true,
-    data: question
-  });
 });
 
 exports.deleteQuestion = asyncHandler(async (req, res) => {
-  const question = await Question.findById(req.params.id);
-  if (!question) {
-    return res.status(404).json({
-      success: false,
-      message: 'Вопрос не найден'
-    });
+  try {
+    const question = await Question.findById(req.params.id);
+    if (!question) {
+      return errorResponse(res, 'Вопрос не найден', 404);
+    }
+    await question.remove();
+    successResponse(res, null, 204);
+  } catch (error) {
+    errorResponse(res, error.message);
   }
-  await question.remove();
-  res.status(200).json({
-    success: true,
-    data: {}
-  });
 });
