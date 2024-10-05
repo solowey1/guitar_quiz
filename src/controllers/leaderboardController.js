@@ -42,7 +42,7 @@ const getLeaderboardData = async (limit = 5) => {
 
 exports.getLeaderboard = asyncHandler(async (req, res) => {
   try {
-    const userId = req.query.userId;
+    const userId = req.query.user;
     const fullLeaderboard = await getLeaderboardData();
     let response = fullLeaderboard.slice(0, 5);
 
