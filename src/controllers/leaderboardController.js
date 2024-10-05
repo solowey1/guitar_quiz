@@ -1,4 +1,4 @@
-const Answer = require('../models/answer');
+import Answer from '../models/answer';
 const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
 const { successResponse, errorResponse } = require('../utils/responseHandler');
@@ -72,7 +72,7 @@ exports.getLeaderboard = asyncHandler(async (req, res) => {
 
 
 // const mongoose = require('mongoose');
-// const Answer = require('../models/Answer');
+// import Answer from '../models/answer';
 // const User = require('../models/User');
 // const asyncHandler = require('../utils/asyncHandler');
 // const { successResponse, errorResponse } = require('../utils/responseHandler');

@@ -1,4 +1,4 @@
-const Answer = require('../models/answer');
+import Answer from '../models/answer';
 const asyncHandler = require('../utils/asyncHandler');
 const { successResponse, errorResponse } = require('../utils/responseHandler');
 const { checkAnswers } = require('../utils/checkAnswers');
