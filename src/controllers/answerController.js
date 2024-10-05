@@ -1,24 +1,27 @@
 const Answer = require('../models/Answer');
 const asyncHandler = require('../utils/asyncHandler');
 const { successResponse, errorResponse } = require('../utils/responseHandler');
-const { checkAnswers } = require('../utils/checkAnswers');
+const { checkAnswer } = require('../utils/checkAnswers');
 
 exports.submitAnswer = asyncHandler(async (req, res) => {
   try {
-    const { userId, answers, timeSpent } = req.body;
+    const { userId, questionId, answers, timeSpent } = req.body;
 
-    const checkedData = await checkAnswers(answers, timeSpent);
+    const checkedData = await checkAnswer(questionId, answers, timeSpent);
 
-    const Answer = await Answer.create({
+    const newAnswer = await Answer.create({
       userId,
-      answers: checkedData.answers,
+      questionId,
+      userAnswers: checkedData.userAnswers,
+      correctAnswers: checkedData.correctAnswers,
+      correctCount: checkedData.correctCount,
       totalCorrect: checkedData.totalCorrect,
-      totalQuestions: checkedData.totalQuestions,
+      isFullyCorrect: checkedData.isFullyCorrect,
       score: checkedData.score,
       timeSpent
     });
 
-    successResponse(res, Answer, 201);
+    successResponse(res, newAnswer, 201);
   } catch (error) {
     errorResponse(res, error.message);
   }
@@ -26,12 +29,13 @@ exports.submitAnswer = asyncHandler(async (req, res) => {
 
 exports.getUserAnswers = asyncHandler(async (req, res) => {
   try {
-    const Answers = await Answer.find({ userId: req.params.userId })
-      .populate('userId', 'firstname lastname email');
+    const answers = await Answer.find({ userId: req.params.userId })
+      .populate('userId', 'firstname lastname email')
+      .populate('questionId', 'number title');
 
     successResponse(res, {
-      count: Answers.length,
-      data: Answers
+      count: answers.length,
+      data: answers
     });
   } catch (error) {
     errorResponse(res, error.message);

@@ -1,57 +1,39 @@
 const Question = require('../models/Question');
 
-const calculateScore = (correctAnswers, totalQuestions, timeSeconds) => {
-  const maxPointsPerQuestion = 1000;
-  const averageCompleteness = correctAnswers.reduce((sum, val) => sum + val, 0) /
-    totalQuestions.reduce((sum, val) => sum + val, 0);
-
-  const answerPoints = correctAnswers.reduce((sum, correct, index) => {
-    return sum + (correct / totalQuestions[index]) * maxPointsPerQuestion;
-  }, 0);
-
-  const completenessBonus = averageCompleteness * 10000;
-  const finalScore = answerPoints + completenessBonus - timeSeconds;
-
-  return finalScore;
+const calculateScore = (correctCount, totalCorrect, timeSpent) => {
+  const baseScore = 1000;
+  const completeness = correctCount / totalCorrect;
+  const timeMultiplier = Math.max(0, 1 - timeSpent / 120000); // 2 минуты максимум
+  return Math.round(baseScore * completeness * timeMultiplier);
 };
 
-exports.checkAnswers = async (answers, timeSpent) => {
-  let totalCorrect = 0;
-  let totalQuestions = answers.length;
-  let correctAnswersArray = [];
-  let totalQuestionsArray = [];
+exports.checkAnswer = async (questionId, userAnswers, timeSpent) => {
+  const question = await Question.findById(questionId);
+  if (!question) {
+    throw new Error(`Вопрос с ID ${questionId} не найден`);
+  }
 
-  const checkedAnswers = await Promise.all(answers.map(async (answer) => {
-    const question = await Question.findById(answer.questionId);
-    if (!question) {
-      throw new Error(`Вопрос с ID ${answer.questionId} не найден`);
-    }
+  const correctAnswers = question.options
+    .filter(option => option.isCorrect)
+    .map(option => option.text);
 
-    const correctOptions = question.options
-      .map((option, index) => option.isCorrect ? index : -1)
-      .filter(index => index !== -1);
+  // Проверяем каждый ответ пользователя
+  const correctCount = userAnswers.filter(answer =>
+    correctAnswers.some(correctAnswer =>
+      correctAnswer.toLowerCase() === answer.toLowerCase()
+    )
+  ).length;
 
-    const isFullyCorrect = JSON.stringify(answer.selectedOptions.sort()) === JSON.stringify(correctOptions.sort());
-    const partialScore = answer.selectedOptions.filter(option => correctOptions.includes(option)).length / correctOptions.length;
+  const isFullyCorrect = correctCount === correctAnswers.length && userAnswers.length === correctAnswers.length;
 
-    totalCorrect += isFullyCorrect ? 1 : 0;
-    correctAnswersArray.push(partialScore * correctOptions.length);
-    totalQuestionsArray.push(correctOptions.length);
-
-    return {
-      ...answer,
-      correctOptions,
-      isFullyCorrect,
-      partialScore
-    };
-  }));
-
-  const score = calculateScore(correctAnswersArray, totalQuestionsArray, timeSpent);
+  const score = calculateScore(correctCount, correctAnswers.length, timeSpent);
 
   return {
-    answers: checkedAnswers,
-    totalCorrect,
-    totalQuestions,
+    correctAnswers,
+    userAnswers,
+    correctCount,
+    totalCorrect: correctAnswers.length,
+    isFullyCorrect,
     score
   };
 };
