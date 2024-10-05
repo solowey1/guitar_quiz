@@ -25,19 +25,19 @@ mongoose.connect(process.env.MONGODB_URI)
 
 app.use(express.json());
 
-app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/questions', require('./routes/questionRoutes'));
 app.use('/api/answers', require('./routes/answerRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/leaderboard', require('./routes/leaderboardRoutes'));
 app.use('/', (req, res) => {
   res.json({
     message: `Welcome to ${packageJson.name} API`,
     version: packageJson.version,
     endpoints: [
-      '/api/leaderboard',
       '/api/questions',
+      '/api/answers',
       '/api/users',
-      '/api/answers'
+      '/api/leaderboard'
     ]
   });
 });
