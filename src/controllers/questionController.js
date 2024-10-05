@@ -1,17 +1,24 @@
 const Question = require('../models/Question');
 const asyncHandler = require('../utils/asyncHandler');
 const { checkAuthorization } = require('../utils/checkAuthorization');
+const { shuffleArray } = require('../utils/helpers');
 const { successResponse, errorResponse } = require('../utils/responseHandler');
 
-const processQuestion = (question, isAuthorized) => {
+const processQuestion = (question, isAuthorized, isRandom = false) => {
+  const processedQuestion = question.toObject();
+
   if (!isAuthorized) {
-    const processedQuestion = question.toObject();
     processedQuestion.options = processedQuestion.options.map(option => ({
       text: option.text,
     }));
     return processedQuestion;
   }
-  return question;
+
+  if (isRandom) {
+    processedQuestion.options = shuffleArray(processedQuestion.options);
+  }
+
+  return processedQuestion;
 };
 
 exports.createQuestion = asyncHandler(async (req, res) => {
@@ -33,9 +40,10 @@ exports.createQuestion = asyncHandler(async (req, res) => {
 exports.getQuestions = asyncHandler(async (req, res) => {
   try {
     const isAuthorized = checkAuthorization(req);
+    const isRandom = 'random' in req.query;
     const questions = await Question.find().sort('number');
     const processedQuestions = questions.map(question =>
-      processQuestion(question, isAuthorized)
+      processQuestion(question, isAuthorized, isRandom)
     );
 
     successResponse(res, {
@@ -50,12 +58,13 @@ exports.getQuestions = asyncHandler(async (req, res) => {
 exports.getQuestion = asyncHandler(async (req, res) => {
   try {
     const isAuthorized = checkAuthorization(req);
+    const isRandom = 'random' in req.query;
     const question = await Question.findById(req.params.id);
     if (!question) {
       return errorResponse(res, 'Question not found', 404);
     }
 
-    const processedQuestion = processQuestion(question, isAuthorized);
+    const processedQuestion = processQuestion(question, isAuthorized, isRandom);
     successResponse(res, processedQuestion);
   } catch (error) {
     errorResponse(res, error.message);
@@ -65,12 +74,13 @@ exports.getQuestion = asyncHandler(async (req, res) => {
 exports.getQuestionByNumber = asyncHandler(async (req, res) => {
   try {
     const isAuthorized = checkAuthorization(req);
+    const isRandom = 'random' in req.query;
     const question = await Question.findOne({ number: req.params.number });
     if (!question) {
       return errorResponse(res, 'Question not found', 404);
     }
 
-    const processedQuestion = processQuestion(question, isAuthorized);
+    const processedQuestion = processQuestion(question, isAuthorized, isRandom);
     successResponse(res, processedQuestion);
   } catch (error) {
     errorResponse(res, error.message);
