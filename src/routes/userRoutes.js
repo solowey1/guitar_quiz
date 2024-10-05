@@ -18,7 +18,7 @@ router.route('/')
 
 router.route('/:id')
   .get(logRouteCall('GET /users/:id'), controller.getUser)
-  .put(logRouteCall('PUT /users/:id'), controller.updateUser)
+  .patch(logRouteCall('PATCH /users/:id'), controller.updateUser)
   .delete(logRouteCall('DELETE /users/:id'), protect, controller.deleteUser);
 
 // router.route('/')
@@ -27,7 +27,7 @@ router.route('/:id')
 
 // router.route('/:id')
 //   .get(controller.getUser)
-//   .put(controller.updateUser)
+//   .patch(controller.updateUser)
 //   .delete(protect, controller.deleteUser);
 
 module.exports = router;

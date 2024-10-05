@@ -52,7 +52,7 @@ exports.getQuestion = asyncHandler(async (req, res) => {
     const isAuthorized = checkAuthorization(req);
     const question = await Question.findById(req.params.id);
     if (!question) {
-      return errorResponse(res, 'Вопрос не найден', 404);
+      return errorResponse(res, 'Question not found', 404);
     }
 
     const processedQuestion = processQuestion(question, isAuthorized);
@@ -67,7 +67,7 @@ exports.getQuestionByNumber = asyncHandler(async (req, res) => {
     const isAuthorized = checkAuthorization(req);
     const question = await Question.findOne({ number: req.params.number });
     if (!question) {
-      return errorResponse(res, 'Вопрос не найден', 404);
+      return errorResponse(res, 'Question not found', 404);
     }
 
     const processedQuestion = processQuestion(question, isAuthorized);
@@ -81,7 +81,7 @@ exports.updateQuestion = asyncHandler(async (req, res) => {
   try {
     let question = await Question.findById(req.params.id);
     if (!question) {
-      return errorResponse(res, 'Вопрос не найден', 404);
+      return errorResponse(res, 'Question not found', 404);
     }
     question = await Question.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -97,9 +97,9 @@ exports.deleteQuestion = asyncHandler(async (req, res) => {
   try {
     const question = await Question.findById(req.params.id);
     if (!question) {
-      return errorResponse(res, 'Вопрос не найден', 404);
+      return errorResponse(res, 'Question not found', 404);
     }
-    await question.remove();
+    await Question.deleteOne({ _id: req.params.id });
     successResponse(res, null, 204);
   } catch (error) {
     errorResponse(res, error.message);

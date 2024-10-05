@@ -10,7 +10,7 @@ router.route('/')
 
 router.route('/:id')
   .get(controller.getQuestion)
-  .put(protect, controller.updateQuestion)
+  .patch(protect, controller.updateQuestion)
   .delete(protect, controller.deleteQuestion);
 
 router.route('/number/:number')
