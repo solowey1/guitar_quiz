@@ -1,4 +1,4 @@
-const UserAnswer = require('../models/UserAnswer');
+const Answer = require('../models/answer');
 const asyncHandler = require('../utils/asyncHandler');
 const { successResponse, errorResponse } = require('../utils/responseHandler');
 const { checkAnswers } = require('../utils/checkAnswers');
@@ -9,7 +9,7 @@ exports.submitAnswer = asyncHandler(async (req, res) => {
 
     const checkedData = await checkAnswers(answers, timeSpent);
 
-    const userAnswer = await UserAnswer.create({
+    const Answer = await Answer.create({
       userId,
       quizId,
       answers: checkedData.answers,
@@ -19,7 +19,7 @@ exports.submitAnswer = asyncHandler(async (req, res) => {
       timeSpent
     });
 
-    successResponse(res, userAnswer, 201);
+    successResponse(res, Answer, 201);
   } catch (error) {
     errorResponse(res, error.message);
   }
@@ -27,13 +27,13 @@ exports.submitAnswer = asyncHandler(async (req, res) => {
 
 exports.getUserAnswers = asyncHandler(async (req, res) => {
   try {
-    const userAnswers = await UserAnswer.find({ userId: req.params.userId })
+    const Answers = await Answer.find({ userId: req.params.userId })
       .populate('userId', 'firstname lastname email')
       .populate('quizId', 'title');
 
     successResponse(res, {
-      count: userAnswers.length,
-      data: userAnswers
+      count: Answers.length,
+      data: Answers
     });
   } catch (error) {
     errorResponse(res, error.message);

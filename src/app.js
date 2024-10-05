@@ -27,7 +27,7 @@ app.use(express.json());
 
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/questions', require('./routes/questionRoutes'));
-app.use('/api/user-answers', require('./routes/userAnswerRoutes'));
+app.use('/api/answers', require('./routes/answerRoutes'));
 app.use('/api/leaderboard', require('./routes/leaderboardRoutes'));
 app.use('/', (req, res) => {
   res.json({
@@ -37,7 +37,7 @@ app.use('/', (req, res) => {
       '/api/leaderboard',
       '/api/questions',
       '/api/users',
-      '/api/user-answers'
+      '/api/answers'
     ]
   });
 });

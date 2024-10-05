@@ -1,15 +1,12 @@
 const express = require('express');
-const {
-  submitAnswer,
-  getUserAnswers
-} = require('../controllers/userAnswerController');
+const controller = require('../controllers/answerController');
 
 const router = express.Router();
 
 router.route('/')
-  .post(submitAnswer);
+  .post(controller.submitAnswer);
 
 router.route('/user/:userId')
-  .get(getUserAnswers);
+  .get(controller.getUserAnswers);
 
 module.exports = router;
