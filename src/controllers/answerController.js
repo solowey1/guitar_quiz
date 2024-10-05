@@ -5,13 +5,12 @@ const { checkAnswers } = require('../utils/checkAnswers');
 
 exports.submitAnswer = asyncHandler(async (req, res) => {
   try {
-    const { userId, quizId, answers, timeSpent } = req.body;
+    const { userId, answers, timeSpent } = req.body;
 
     const checkedData = await checkAnswers(answers, timeSpent);
 
     const Answer = await Answer.create({
       userId,
-      quizId,
       answers: checkedData.answers,
       totalCorrect: checkedData.totalCorrect,
       totalQuestions: checkedData.totalQuestions,
@@ -28,8 +27,7 @@ exports.submitAnswer = asyncHandler(async (req, res) => {
 exports.getUserAnswers = asyncHandler(async (req, res) => {
   try {
     const Answers = await Answer.find({ userId: req.params.userId })
-      .populate('userId', 'firstname lastname email')
-      .populate('quizId', 'title');
+      .populate('userId', 'firstname lastname email');
 
     successResponse(res, {
       count: Answers.length,
