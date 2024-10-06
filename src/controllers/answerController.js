@@ -9,7 +9,7 @@ exports.submitAnswer = asyncHandler(async (req, res) => {
 
     const existingAnswer = await Answer.findOne({ userId, questionId });
     if (existingAnswer) {
-      successResponse(res, { message: 'Вы уже отвечали на этот вопрос' });
+      successResponse(res, { ...existingAnswer, message: 'Вы уже отвечали на этот вопрос' });
     }
 
     const checkedData = await checkAnswer(questionId, answers, timeSpent);
