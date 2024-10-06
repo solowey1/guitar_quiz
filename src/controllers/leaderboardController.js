@@ -12,7 +12,8 @@ const getLeaderboardData = async () => {
         totalTime: { $sum: "$timeSpent" },
         correctAnswersCount: {
           $sum: { $cond: ["$isFullyCorrect", 1, 0] }
-        }
+        },
+        correctAnswers: { $push: "$isFullyCorrect" }
       }
     },
     { $sort: { totalScore: -1, totalTime: 1 } },
@@ -32,7 +33,8 @@ const getLeaderboardData = async () => {
         name: { $concat: ["$user.firstname", " ", "$user.lastname"] },
         totalScore: 1,
         totalTime: 1,
-        correctAnswersCount: 1
+        correctAnswersCount: 1,
+        correctAnswers: 1
       }
     }
   ]);
@@ -62,12 +64,12 @@ exports.getLeaderboard = asyncHandler(async (req, res) => {
         response.push(userEntry);
       }
     }
-    
+
     response = response.map(entry => {
       if (userId && entry.userId.toString() === userId) {
         return entry;
       } else {
-        const { userId, ...rest } = entry;
+        const { userId, correctAnswers, ...rest } = entry;
         return rest;
       }
     });
