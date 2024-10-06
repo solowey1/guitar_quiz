@@ -46,10 +46,7 @@ exports.getQuestions = asyncHandler(async (req, res) => {
       processQuestion(question, isAuthorized, isRandom)
     );
 
-    successResponse(res, {
-      count: processedQuestions.length,
-      data: processedQuestions
-    });
+    successResponse(res, processedQuestions);
   } catch (error) {
     errorResponse(res, error.message);
   }
