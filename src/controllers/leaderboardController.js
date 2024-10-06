@@ -25,6 +25,7 @@ const getLeaderboardData = async () => {
     {
       $project: {
         _id: 0,
+        userId: "$_id",
         name: { $concat: ["$user.firstname", " ", "$user.lastname"] },
         totalScore: 1,
         totalTime: 1
@@ -45,7 +46,7 @@ exports.getLeaderboard = asyncHandler(async (req, res) => {
     let response = fullLeaderboard.slice(0, 5);
 
     if (userId) {
-      const userPosition = fullLeaderboard.findIndex(entry => entry._id.toString() === userId);
+      const userPosition = fullLeaderboard.findIndex(entry => entry.userId.toString() === userId);
 
       if (userPosition === -1) {
         return errorResponse(res, 'Пользователя нет в таблице лидеров', 404);
@@ -53,10 +54,12 @@ exports.getLeaderboard = asyncHandler(async (req, res) => {
 
       const userEntry = fullLeaderboard[userPosition];
 
-      if (userPosition >= 5 && !response.some(entry => entry._id.toString() === userId)) {
+      if (userPosition >= 5 && !response.some(entry => entry.userId.toString() === userId)) {
         response.push(userEntry);
       }
     }
+
+    response = response.map(({ userId, ...rest }) => rest);
 
     return successResponse(res, response);
   } catch (error) {
