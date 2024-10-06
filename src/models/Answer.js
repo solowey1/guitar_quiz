@@ -14,4 +14,6 @@ const AnswerSchema = new mongoose.Schema({
   timestamps: true
 });
 
+AnswerSchema.index({ userId: 1, questionId: 1 }, { unique: true });
+
 module.exports = mongoose.model('Answer', AnswerSchema);

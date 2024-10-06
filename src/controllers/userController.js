@@ -5,7 +5,13 @@ const { successResponse, errorResponse } = require('../utils/responseHandler');
 exports.createUser = asyncHandler(async (req, res) => {
   try {
     if (req.body.email) req.body.email = req.body.email.toLowerCase();
-    const user = await User.create(req.body);
+
+    const user = await User.findOneAndUpdate(
+      { email: req.body.email },
+      req.body,
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
+
     successResponse(res, user, 201);
   } catch (error) {
     errorResponse(res, error.message);
