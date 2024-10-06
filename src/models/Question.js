@@ -4,7 +4,7 @@ const QuestionSchema = new mongoose.Schema({
   number: { type: Number, required: true, unique: true },
   title: { type: String, required: true, set: v => v.trim() },
   descr: { type: String, set: v => v.trim() },
-  options: [{
+  answers: [{
     text: { type: String, set: v => v.trim() },
     isCorrect: Boolean
   }],

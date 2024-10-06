@@ -8,14 +8,14 @@ const processQuestion = (question, isAuthorized, isRandom = false) => {
   const processedQuestion = question.toObject();
 
   if (!isAuthorized) {
-    processedQuestion.options = processedQuestion.options.map(option => ({
+    processedQuestion.answers = processedQuestion.answers.map(option => ({
       text: option.text,
     }));
     return processedQuestion;
   }
 
   if (isRandom) {
-    processedQuestion.options = shuffleArray(processedQuestion.options);
+    processedQuestion.answers = shuffleArray(processedQuestion.answers);
   }
 
   return processedQuestion;
