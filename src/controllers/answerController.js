@@ -5,14 +5,14 @@ const { checkAnswer } = require('../utils/checkAnswers');
 
 exports.submitAnswer = asyncHandler(async (req, res) => {
   try {
-    const { userId, questionId, answers, timeSpent } = req.body;
+    const { userId, questionId, options, timeSpent } = req.body;
 
     // const existingAnswer = await Answer.findOne({ userId, questionId });
     // if (existingAnswer) {
     //   successResponse(res, { ...existingAnswer, message: 'Вы уже отвечали на этот вопрос' });
     // }
 
-    const checkedData = await checkAnswer(questionId, answers, timeSpent);
+    const checkedData = await checkAnswer(questionId, options, timeSpent);
 
     const newAnswer = await Answer.create({
       userId,
