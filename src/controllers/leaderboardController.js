@@ -25,7 +25,6 @@ const getLeaderboardData = async () => {
     {
       $project: {
         _id: 0,
-        userId: "$_id",
         name: { $concat: ["$user.firstname", " ", "$user.lastname"] },
         totalScore: 1,
         totalTime: 1
