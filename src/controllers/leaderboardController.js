@@ -8,11 +8,11 @@ const getLeaderboardData = async () => {
     {
       $group: {
         _id: "$userId",
+        totalScore: { $sum: "$score" },
+        totalTime: { $sum: "$timeSpent" },
         correctAnswersCount: {
           $sum: { $cond: ["$isFullyCorrect", 1, 0] }
-        },
-        totalScore: { $sum: "$score" },
-        totalTime: { $sum: "$timeSpent" }
+        }
       }
     },
     { $sort: { totalScore: -1, totalTime: 1 } },
@@ -30,9 +30,9 @@ const getLeaderboardData = async () => {
         _id: 0,
         userId: "$_id",
         name: { $concat: ["$user.firstname", " ", "$user.lastname"] },
-        correctAnswers: 1,
         totalScore: 1,
-        totalTime: 1
+        totalTime: 1,
+        correctAnswersCount: 1
       }
     }
   ]);
