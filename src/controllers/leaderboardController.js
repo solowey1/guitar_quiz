@@ -62,8 +62,15 @@ exports.getLeaderboard = asyncHandler(async (req, res) => {
         response.push(userEntry);
       }
     }
-
-    response = response.map(({ userId, ...rest }) => rest);
+    
+    response = response.map(entry => {
+      if (userId && entry.userId.toString() === userId) {
+        return entry;
+      } else {
+        const { userId, ...rest } = entry;
+        return rest;
+      }
+    });
 
     return successResponse(res, response);
   } catch (error) {
