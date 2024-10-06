@@ -7,13 +7,24 @@ exports.submitAnswer = asyncHandler(async (req, res) => {
   try {
     const { userId, questionId, options, timeSpent } = req.body;
 
-    // const existingAnswer = await Answer.findOne({ userId, questionId });
-    // if (existingAnswer) {
-    //   successResponse(res, { ...existingAnswer, message: 'Вы уже отвечали на этот вопрос' });
-    // }
-
     const checkedData = await checkAnswer(questionId, options, timeSpent);
 
+    // Проверяем, существует ли уже ответ на этот вопрос
+    const existingAnswer = await Answer.findOne({ userId, questionId });
+
+    if (existingAnswer) {
+      // Если существующий ответ лучше или равен новому, возвращаем его
+      if (existingAnswer.score >= checkedData.score) {
+        return successResponse(res, {
+          ...existingAnswer.toObject(),
+          message: 'Сохранен лучший предыдущий ответ'
+        });
+      }
+      // Если новый ответ лучше, удаляем старый
+      await Answer.findByIdAndDelete(existingAnswer._id);
+    }
+
+    // Создаем новый ответ
     const newAnswer = await Answer.create({
       userId,
       questionId,
@@ -26,7 +37,11 @@ exports.submitAnswer = asyncHandler(async (req, res) => {
       timeSpent
     });
 
-    successResponse(res, newAnswer, 201);
+    successResponse(res, {
+      ...newAnswer.toObject(),
+      message: existingAnswer ? 'Сохранен новый лучший ответ' : 'Ответ сохранен'
+    }, 201);
+
   } catch (error) {
     errorResponse(res, error.message);
   }
