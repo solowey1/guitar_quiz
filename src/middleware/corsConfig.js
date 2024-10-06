@@ -3,12 +3,13 @@ const cors = require('cors');
 const allowedOrigins = [
   'http://localhost:3000',
   'https://orion-quiz.webflow.io',
+  'https://guitar.solowey.ru'
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, origin);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
