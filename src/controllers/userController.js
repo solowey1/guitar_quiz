@@ -4,14 +4,7 @@ const { successResponse, errorResponse } = require('../utils/responseHandler');
 
 exports.createUser = asyncHandler(async (req, res) => {
   try {
-    if (!!req.body.email) {
-      req.body.email = req.body.email.toLowerCase();
-    } else {
-      throw new Error('Email обязателен для заполнения');
-    }
-    if (!!req.body.phone) { throw new Error('Телефон обязателен для заполнения') }
-    if (!!req.body.lastname) { throw new Error('Фамилия обязателна для заполнения') }
-    if (!!req.body.firstname) { throw new Error('Имя обязателено для заполнения') }
+    if (req.body.email) req.body.email = req.body.email.toLowerCase();
     
     const user = await User.findOneAndUpdate(
       { email: req.body.email },
