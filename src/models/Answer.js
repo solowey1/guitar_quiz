@@ -3,13 +3,13 @@ const mongoose = require('mongoose');
 const AnswerSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   questionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Question', required: true },
-  userAnswers: [String],
-  correctAnswers: [String],
-  correctCount: Number,
-  totalCorrect: Number,
+  userAnswers: [{ type: String, set: v => v.trim() }],
+  correctAnswers: [{ type: String, set: v => v.trim() }],
+  correctCount: { type: Number, min: 0 },
+  totalCorrect: { type: Number, min: 0 },
   isFullyCorrect: Boolean,
   score: Number,
-  timeSpent: Number
+  timeSpent: { type: Number, min: 0 }
 }, {
   timestamps: true
 });
