@@ -3,6 +3,7 @@ const packageJson = require('../package.json');
 const mongoose = require('mongoose');
 const express = require('express');
 const morgan = require('morgan');
+const path = require('path');
 const corsMiddleware = require('./middleware/corsConfig');
 const errorHandler = require('./middleware/errorHandler');
 
