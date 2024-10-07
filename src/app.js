@@ -12,6 +12,8 @@ app.use(corsMiddleware);
 
 app.use(morgan('[:date[iso]] :method :url :status :response-time ms - :res[content-length]'));
 
+app.use('/public', express.static(path.join(__dirname, '..', 'public')));
+
 app.use((req, res, next) => {
   console.log(`Incoming request: ${req.method} ${req.url}`);
   console.log('Headers:', req.headers);
