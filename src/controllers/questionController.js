@@ -21,6 +21,32 @@ const processQuestion = (question, isAuthorized, isRandom = false) => {
   return processedQuestion;
 };
 
+exports.createMultipleQuestions = asyncHandler(async (req, res) => {
+  try {
+    const questionsData = req.body;
+
+    if (!Array.isArray(questionsData) || questionsData.length === 0) {
+      return errorResponse(res, 'Invalid input: expected non-empty array of questions', 400);
+    }
+
+    const lastQuestion = await Question.findOne().sort('-number');
+    let newNumber = lastQuestion ? lastQuestion.number + 1 : 1;
+
+    const createdQuestions = await Promise.all(questionsData.map(async (questionData) => {
+      const question = new Question({
+        ...questionData,
+        number: newNumber++
+      });
+      await question.save();
+      return question;
+    }));
+
+    successResponse(res, createdQuestions, 201);
+  } catch (error) {
+    errorResponse(res, error.message, 500);
+  }
+});
+
 exports.createQuestion = asyncHandler(async (req, res) => {
   try {
     const lastQuestion = await Question.findOne().sort('-number');

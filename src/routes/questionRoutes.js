@@ -8,6 +8,9 @@ router.route('/')
   .get(controller.getQuestions)
   .post(controller.createQuestion);
 
+router.route('/many')
+  .post(controller.createMultipleQuestions);
+
 router.route('/:id')
   .get(controller.getQuestion)
   .patch(protect, controller.updateQuestion)
