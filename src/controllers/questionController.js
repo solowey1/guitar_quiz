@@ -23,26 +23,45 @@ const processQuestion = (question, isAuthorized, isRandom = false) => {
 
 exports.createMultipleQuestions = asyncHandler(async (req, res) => {
   try {
-    const questionsData = req.body;
+    let questionsData = req.body;
+
+    // Проверяем, не обернуты ли данные дополнительно в объект
+    if (!Array.isArray(questionsData) && questionsData.questions && Array.isArray(questionsData.questions)) {
+      questionsData = questionsData.questions;
+    }
 
     if (!Array.isArray(questionsData) || questionsData.length === 0) {
       return errorResponse(res, 'Invalid input: expected non-empty array of questions', 400);
     }
 
     const lastQuestion = await Question.findOne().sort('-number');
-    let newNumber = lastQuestion ? lastQuestion.number + 1 : 1;
+    let newNumber = lastQuestion ? lastQuestion.number : 0;
 
     const createdQuestions = await Promise.all(questionsData.map(async (questionData) => {
+      // Проверяем наличие обязательных полей
+      if (!questionData.title || !questionData.options) {
+        throw new Error(`Invalid question data: missing title or options for question ${JSON.stringify(questionData)}`);
+      }
+
+      newNumber++; // Увеличиваем номер перед созданием вопроса
+
       const question = new Question({
         ...questionData,
-        number: newNumber++
+        number: newNumber
       });
+
+      // Явно устанавливаем поля модели
+      if (questionData.comment) question.comment = questionData.comment;
+      if (questionData.descr) question.descr = questionData.descr;
+      if (questionData.fact) question.fact = questionData.fact;
+
       await question.save();
       return question;
     }));
 
     successResponse(res, createdQuestions, 201);
   } catch (error) {
+    console.error('Error in createMultipleQuestions:', error);
     errorResponse(res, error.message, 500);
   }
 });
