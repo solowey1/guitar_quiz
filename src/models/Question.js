@@ -5,7 +5,7 @@ const QuestionSchema = new mongoose.Schema({
   title: { type: String, required: true },
   descr: { type: String },
   options: [{
-    text: { type: String },
+    text: { type: String, required: true },
     isCorrect: Boolean
   }],
   comment: {
