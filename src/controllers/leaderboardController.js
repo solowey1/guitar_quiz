@@ -1,7 +1,7 @@
 const Answer = require('../models/Answer');
 const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
-const { successResponse, errorResponse } = require('../utils/responseHandler');
+const { successResponseWithMessage, errorResponse } = require('../utils/responseHandler');
 
 const getLeaderboardData = async () => {
   const leaderboard = await Answer.aggregate([
@@ -50,18 +50,21 @@ exports.getLeaderboard = asyncHandler(async (req, res) => {
     const userId = req.query.user;
     const fullLeaderboard = await getLeaderboardData();
     let response = fullLeaderboard.slice(0, 5);
+    let message = '';
+    let statusCode = 200;
 
     if (userId) {
       const userPosition = fullLeaderboard.findIndex(entry => entry.userId.toString() === userId);
 
       if (userPosition === -1) {
-        return errorResponse(res, 'Пользователя нет в таблице лидеров', 404);
-      }
+        message = 'Пользователя нет в таблице лидеров';
+        statusCode = 207;
+      } else {
+        const userEntry = fullLeaderboard[userPosition];
 
-      const userEntry = fullLeaderboard[userPosition];
-
-      if (userPosition >= 5 && !response.some(entry => entry.userId.toString() === userId)) {
-        response.push(userEntry);
+        if (userPosition >= 5 && !response.some(entry => entry.userId.toString() === userId)) {
+          response.push(userEntry);
+        }
       }
     }
 
@@ -74,7 +77,7 @@ exports.getLeaderboard = asyncHandler(async (req, res) => {
       }
     });
 
-    return successResponse(res, response);
+    return successResponseWithMessage(res, response, message, statusCode);
   } catch (error) {
     return errorResponse(res, error.message);
   }
