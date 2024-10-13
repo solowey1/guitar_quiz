@@ -2,8 +2,8 @@ const cors = require('cors');
 
 const allowedOrigins = [
   'http://localhost:3000',
+  'https://nova.orionsoft.ru',
   'https://orion-quiz.webflow.io',
-  'https://guitar.solowey.ru'
 ];
 
 const corsOptions = {
