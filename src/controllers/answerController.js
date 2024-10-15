@@ -14,13 +14,13 @@ exports.submitAnswer = asyncHandler(async (req, res) => {
 
     if (existingAnswer) {
       // Если существующий ответ лучше или равен новому, возвращаем его
-      if (existingAnswer.score >= checkedData.score) {
-        return successResponse(res, {
-          ...existingAnswer.toObject(),
-          message: 'Сохранен лучший предыдущий ответ'
-        });
-      }
-      // Если новый ответ лучше, удаляем старый
+      // if (existingAnswer.score >= checkedData.score) {
+      //   return successResponse(res, {
+      //     ...existingAnswer.toObject(),
+      //     message: 'Сохранен лучший предыдущий ответ'
+      //   });
+      // }
+      // Удаляем старый ответ
       await Answer.findByIdAndDelete(existingAnswer._id);
     }
 
