@@ -2,17 +2,34 @@ const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
 const { successResponse, errorResponse } = require('../utils/responseHandler');
 
+// exports.createUser = asyncHandler(async (req, res) => {
+//   try {
+//     if (req.body.email) req.body.email = req.body.email.toLowerCase();
+    
+//     const user = await User.findOneAndUpdate(
+//       { email: req.body.email },
+//       req.body,
+//       { new: true, upsert: true, setDefaultsOnInsert: true }
+//     );
+    
+//     successResponse(res, user, 201);
+//   } catch (error) {
+//     errorResponse(res, error.message);
+//   }
+// });
+
 exports.createUser = asyncHandler(async (req, res) => {
   try {
     if (req.body.email) req.body.email = req.body.email.toLowerCase();
-    
-    const user = await User.findOneAndUpdate(
-      { email: req.body.email },
-      req.body,
-      { new: true, upsert: true, setDefaultsOnInsert: true }
-    );
-    
-    successResponse(res, user, 201);
+
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Вы уже проходили квиз' });
+    }
+
+    const newUser = await User.create(req.body);
+
+    successResponse(res, newUser, 201);
   } catch (error) {
     errorResponse(res, error.message);
   }
