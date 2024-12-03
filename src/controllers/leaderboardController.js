@@ -48,8 +48,9 @@ const getLeaderboardData = async () => {
 exports.getLeaderboard = asyncHandler(async (req, res) => {
   try {
     const userId = req.query.user;
+    const limit = !!req.query.limit ? Number(req.query.limit) : 5;
     const fullLeaderboard = await getLeaderboardData();
-    let response = fullLeaderboard.slice(0, 5);
+    let response = fullLeaderboard.slice(0, limit);
     let message = '';
     let statusCode = 200;
 
@@ -62,7 +63,7 @@ exports.getLeaderboard = asyncHandler(async (req, res) => {
       } else {
         const userEntry = fullLeaderboard[userPosition];
 
-        if (userPosition >= 5 && !response.some(entry => entry.userId.toString() === userId)) {
+        if (userPosition >= limit && !response.some(entry => entry.userId.toString() === userId)) {
           response.push(userEntry);
         }
       }
