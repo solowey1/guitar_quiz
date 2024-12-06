@@ -20,15 +20,7 @@ const { successResponse, errorResponse } = require('../utils/responseHandler');
 
 exports.createUser = asyncHandler(async (req, res) => {
   try {
-    if (req.body.email) req.body.email = req.body.email.toLowerCase();
-
-    const existingUser = await User.findOne({ email: req.body.email });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Вы уже проходили квиз' });
-    }
-
     const newUser = await User.create(req.body);
-
     successResponse(res, newUser, 201);
   } catch (error) {
     errorResponse(res, error.message);
@@ -65,6 +57,11 @@ exports.updateUser = asyncHandler(async (req, res) => {
     const updateData = { ...req.body };
     
     if (updateData.email) updateData.email = updateData.email.toLowerCase();
+
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Вы уже проходили квиз' });
+    }
     
     const updatedUser = await User.findOneAndUpdate(
       { _id: id },
