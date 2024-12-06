@@ -8,7 +8,7 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Successfully connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-cron.schedule('20 22 * * *', async () => {
+cron.schedule('0 5 * * *', async () => {
   try {
     const usersToDelete = await User.find({
       $or: [
